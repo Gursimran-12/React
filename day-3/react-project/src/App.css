@@ -1,6 +1,7 @@
 /* Styling for Card component */
 
-.card {
+.card
+{
   width: 380px;
   background-color: black;
   color: white;

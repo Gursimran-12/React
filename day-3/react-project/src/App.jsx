@@ -1,6 +1,7 @@
 import './App.css'
 import ProfileCard from './components/profileCard'
 import Navbar from './components/navbar'
+import Button from './components/button'
 
 function App() {
 
@@ -8,6 +9,7 @@ function App() {
     <>
     {/* <ProfileCard /> */}
     <Navbar />
+    <Button value = "Click here" />
     </>
   )
 }
