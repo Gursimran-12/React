@@ -11,7 +11,7 @@ function App() {
   return (
     <>
 
-    {/* <DynamicCard 
+      {/* <DynamicCard 
 
     name = "Gursimran"
     age = "20"
@@ -28,15 +28,21 @@ function App() {
     profileImage={profImg2}
     /> */}
 
-    {/* <ProductList /> */}
+      {/* <ProductList /> */}
 
-    <BlogPost
-    title ="First Blog"
-    content = "Here is the content for the Blog"
-    author = "Author-A"
-    />
+      <BlogPost
+        title="First Blog"
+        content="Here is the content for the First Blog"
+        author="Author-A"
+      />
 
-    
+      <BlogPost
+        title="Second Blog"
+        content="Here is the content for the Second Blog"
+        author="Author-B"
+      />
+
+
     </>
   )
 }
