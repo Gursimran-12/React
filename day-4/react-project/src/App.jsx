@@ -1,10 +1,11 @@
 import './App.css'
-import DynamicCard from './components/products/dynamicCard'
+import DynamicCard from './components/dynamicCard'
 import profImg from './assets/profImg.jpg'
 import profImg2 from './assets/profImg2.jpg'
 import ProductList from './components/products/productList'
-
 import BlogPost from './components/blog/blogPost'
+import Dashboard from './components/dashboard/dashboard'
+import Button from './components/button/button'
 
 
 function App() {
@@ -48,7 +49,7 @@ function App() {
       /> */}
 
       {/* we can do this in following ways as well */}
-     <p> {Posts.map((post) => (
+     {/* <p> {Posts.map((post) => (
       <BlogPost 
       id = {post.id}
       title = {post.title}
@@ -56,7 +57,22 @@ function App() {
       author = {post.author}
       />
 
-     ))} </p>
+     ))} </p> */}
+
+     {/* <Dashboard 
+
+     isLoggedIn= {false}
+     name= {"Ram"}
+     
+     /> */}
+
+     <Button
+
+     text = {"Click here"}
+     color = "red"
+     size = {16}
+     
+     />
 
 
     </>

@@ -42,3 +42,20 @@
   text-align: center;
 }
 
+/* ================================ Button Styling ============================== */
+.button
+{
+  padding: 10px 20px;
+  width: 80px;
+  border-radius: 15px;
+  border: 2px solid black;
+  box-shadow: 0px 10px 25px white;
+  transition: transform 0.3s ease;
+  text-align: center;
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+  color: black;
+}
+
+.button:hover{
+  transform: translateY(-5px);
+}

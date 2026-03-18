@@ -12,7 +12,7 @@
 import Header from './header'
 import Footer from './footer'
 
-function BlogPost({ title, content, author }) {
+function BlogPost({ title, content, author,  }) {
     return (
         <>
         <Header />
