@@ -1,0 +1,135 @@
+/* ================= Styling for Counter Box ================ */
+.counterBox {
+    width: 380px;
+    background-color: black;
+    color: white;
+    margin: 60px auto;
+    padding: 30px 20px;
+    border-radius: 12px;
+    text-align: center;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    box-shadow: 0px 10px 25px black;
+    transition: transform 0.3s ease;
+}
+
+.counterBox:hover {
+    transform: translateY(-5px);
+    background-color: white;
+    color: black;
+}
+
+.btn {
+    background-color: #DAFDBA;
+    color: black;
+    padding: 20px 10px;
+    margin-left: 20px;
+    margin-top: 20px;
+    width: 100px;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 15px;
+    border: none;
+    box-shadow: 0px 5px 10px antiquewhite;
+    transition: transform 0.3s ease;
+}
+
+.btn:hover {
+    transform: translateY(-5px);
+    background-color: pink;
+}
+
+
+/* ========================= Styling for live Text peview ======================== */
+.inputPreview {
+    width: 380px;
+    background-color: black;
+    color: white;
+    margin: 60px auto;
+    padding: 30px 20px;
+    border-radius: 12px;
+    text-align: center;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    box-shadow: 0px 10px 25px black;
+    transition: transform 0.3s ease;
+}
+
+.inputPreview:hover {
+    transform: translateY(-5px);
+    background-color: white;
+    color: black;
+}
+
+input {
+    background-color: #F2E7DC;
+    color: black;
+    padding: 20px 30px;
+    width: 250px;
+    font-size: 18px;
+    margin-top: 15px;
+}
+
+/* ============================== Styling for toggle text ============================ */
+
+.toggleText {
+    width: 380px;
+    background-color: black;
+    color: white;
+    margin: 60px auto;
+    padding: 30px 20px;
+    border-radius: 12px;
+    text-align: center;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    box-shadow: 0px 10px 25px black;
+    transition: transform 0.3s ease;
+}
+
+.toggleText:hover {
+    transform: translateY(-5px);
+    background-color: white;
+    color: black;
+}
+
+/* ============================= Styling for todo List ==================================== */
+
+.todo {
+    width: 380px;
+    background-color: black;
+    color: white;
+    margin: 60px auto;
+    padding: 30px 20px;
+    border-radius: 12px;
+    text-align: center;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    box-shadow: 0px 10px 25px black;
+    transition: transform 0.3s ease;
+}
+
+.todo:hover {
+    transform: translateY(-5px);
+    background-color: white;
+    color: black;
+}
+
+.todolist {
+    list-style: none;
+}
+
+/* ============================ Styling for Submit Form ========================================== */
+.submitForm {
+    width: 380px;
+    background-color: black;
+    color: white;
+    margin: 60px auto;
+    padding: 30px 20px;
+    border-radius: 12px;
+    text-align: center;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    box-shadow: 0px 10px 25px black;
+    transition: transform 0.3s ease;
+}
+
+.submitForm:hover {
+    transform: translateY(-5px);
+    background-color: white;
+    color: black;
+}
