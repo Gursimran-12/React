@@ -1,0 +1,1377 @@
+// Custom Hooks Complete Tutorial - All in One File
+// Topics: Creating reusable hooks, useFetch, useLocalStorage, useDebounce,
+// Hook composition, Rules of hooks, and 3 custom hooks library project
+
+import { useState, useEffect, useRef, useCallback } from 'react';
+
+/* ============================================
+   📚 TABLE OF CONTENTS:
+   
+   1. What are Custom Hooks?
+   2. Rules of Hooks
+   3. Example 1: Simple Custom Hook (useCounter)
+   4. Example 2: useFetch Hook
+   5. Example 3: useLocalStorage Hook
+   6. Example 4: useDebounce Hook
+   7. Hook Composition (Combining Hooks)
+   8. PROJECT: 3 Custom Hooks Library
+      - useToggle
+      - useClickOutside
+      - usePrevious
+   
+   ============================================ */
+
+
+// ============================================
+// 1️⃣ WHAT ARE CUSTOM HOOKS?
+// ============================================
+
+/* 
+Custom Hooks let you extract component logic into reusable functions.
+
+WHY USE CUSTOM HOOKS?
+✅ Reuse logic across multiple components
+✅ Keep components clean and simple
+✅ Share stateful logic without render props or HOCs
+✅ Organize code better
+
+NAMING CONVENTION:
+- Must start with "use" (e.g., useCounter, useFetch)
+- This tells React it's a hook and follows hook rules
+
+EXAMPLE STRUCTURE:
+function useMyHook() {
+  const [state, setState] = useState(initialValue);
+  
+  // Your logic here
+  
+  return [state, setState]; // or { state, setState }
+}
+*/
+
+
+// ============================================
+// 2️⃣ RULES OF HOOKS
+// ============================================
+
+/* 
+🚨 CRITICAL RULES - MUST FOLLOW!
+
+RULE 1: Only call hooks at the TOP LEVEL
+  ✅ DO:
+    function Component() {
+      const [count, setCount] = useState(0);
+      const data = useFetch('/api/data');
+    }
+  
+  ❌ DON'T:
+    function Component() {
+      if (condition) {
+        const [count, setCount] = useState(0); // ❌ In condition
+      }
+      
+      for (let i = 0; i < 10; i++) {
+        const data = useFetch(`/api/${i}`); // ❌ In loop
+      }
+    }
+
+RULE 2: Only call hooks from REACT FUNCTIONS
+  ✅ DO:
+    - React function components
+    - Custom hooks
+  
+  ❌ DON'T:
+    - Regular JavaScript functions
+    - Class components
+    - Event handlers
+
+RULE 3: Custom hooks must start with "use"
+  ✅ DO: useCounter, useFetch, useLocalStorage
+  ❌ DON'T: counter, fetchData, storage
+
+WHY THESE RULES?
+- React relies on the ORDER of hooks to track state
+- Breaking these rules causes bugs and errors
+*/
+
+
+// ============================================
+// 3️⃣ EXAMPLE 1: Simple Custom Hook (useCounter)
+// ============================================
+
+// Custom hook definition
+function useCounter(initialValue = 0, step = 1) {
+  const [count, setCount] = useState(initialValue);
+  
+  const increment = () => setCount(count + step);
+  const decrement = () => setCount(count - step);
+  const reset = () => setCount(initialValue);
+  
+  // Return what the component needs
+  return { count, increment, decrement, reset };
+}
+
+// Using the custom hook
+function Example1_UseCounter() {
+  // Look how clean this is! All logic is in the hook
+  const counter = useCounter(0, 1);
+  const fastCounter = useCounter(0, 10);
+  
+  return (
+    <div style={styles.example}>
+      <h3>Example 1: useCounter (Simple Custom Hook)</h3>
+      
+      <div style={styles.twoColumns}>
+        <div style={styles.counterBox}>
+          <h4>Counter (step: 1)</h4>
+          <div style={styles.bigNumber}>{counter.count}</div>
+          <div style={styles.buttonGroup}>
+            <button onClick={counter.increment} style={styles.button}>+1</button>
+            <button onClick={counter.decrement} style={styles.button}>-1</button>
+            <button onClick={counter.reset} style={styles.buttonSecondary}>Reset</button>
+          </div>
+        </div>
+        
+        <div style={styles.counterBox}>
+          <h4>Fast Counter (step: 10)</h4>
+          <div style={styles.bigNumber}>{fastCounter.count}</div>
+          <div style={styles.buttonGroup}>
+            <button onClick={fastCounter.increment} style={styles.button}>+10</button>
+            <button onClick={fastCounter.decrement} style={styles.button}>-10</button>
+            <button onClick={fastCounter.reset} style={styles.buttonSecondary}>Reset</button>
+          </div>
+        </div>
+      </div>
+      
+      <div style={styles.explanation}>
+        💡 <strong>How it works:</strong><br/>
+        1. We extracted counter logic into useCounter hook<br/>
+        2. Hook returns { '{count, increment, decrement, reset}'}<br/>
+        3. Component just uses the hook - super clean!<br/>
+        4. We can reuse this hook in ANY component<br/>
+        5. We can create multiple counters with different steps
+      </div>
+      
+      <div style={styles.codeBox}>
+        <h4>The Custom Hook Code:</h4>
+        <pre style={styles.code}>{`function useCounter(initialValue = 0, step = 1) {
+  const [count, setCount] = useState(initialValue);
+  
+  const increment = () => setCount(count + step);
+  const decrement = () => setCount(count - step);
+  const reset = () => setCount(initialValue);
+  
+  return { count, increment, decrement, reset };
+}
+
+// Usage:
+const counter = useCounter(0, 1);
+counter.increment(); // count goes up by 1`}</pre>
+      </div>
+    </div>
+  );
+}
+
+
+// ============================================
+// 4️⃣ EXAMPLE 2: useFetch Hook
+// ============================================
+
+// Custom hook for data fetching
+function useFetch(url) {
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  
+  useEffect(() => {
+    // Don't fetch if no URL
+    if (!url) return;
+    
+    setLoading(true);
+    
+    fetch(url)
+      .then(response => {
+        if (!response.ok) throw new Error('Failed to fetch');
+        return response.json();
+      })
+      .then(data => {
+        setData(data);
+        setError(null);
+      })
+      .catch(err => {
+        setError(err.message);
+        setData(null);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+      
+  }, [url]); // Re-fetch when URL changes
+  
+  return { data, loading, error };
+}
+
+// Using the useFetch hook
+function Example2_UseFetch() {
+  const [userId, setUserId] = useState(1);
+  
+  // Look how clean this is! No fetch logic in component
+  const { data: user, loading, error } = useFetch(
+    `https://jsonplaceholder.typicode.com/users/${userId}`
+  );
+  
+  return (
+    <div style={styles.example}>
+      <h3>Example 2: useFetch Hook</h3>
+      
+      <div style={styles.controls}>
+        <label>Select User: </label>
+        <select 
+          value={userId} 
+          onChange={(e) => setUserId(e.target.value)}
+          style={styles.select}
+        >
+          {[1, 2, 3, 4, 5].map(id => (
+            <option key={id} value={id}>User {id}</option>
+          ))}
+        </select>
+      </div>
+      
+      {loading && <div style={styles.loading}>Loading user...</div>}
+      
+      {error && <div style={styles.error}>Error: {error}</div>}
+      
+      {user && (
+        <div style={styles.userCard}>
+          <h4>{user.name}</h4>
+          <p><strong>Email:</strong> {user.email}</p>
+          <p><strong>Phone:</strong> {user.phone}</p>
+          <p><strong>Company:</strong> {user.company.name}</p>
+          <p><strong>Website:</strong> {user.website}</p>
+        </div>
+      )}
+      
+      <div style={styles.explanation}>
+        💡 <strong>Benefits of useFetch:</strong><br/>
+        ✅ Reusable across all components<br/>
+        ✅ Handles loading, error, data states automatically<br/>
+        ✅ Re-fetches when URL changes<br/>
+        ✅ Component stays clean and simple<br/>
+        ✅ Can add features once (caching, retry) - all components benefit
+      </div>
+      
+      <div style={styles.codeBox}>
+        <h4>The useFetch Hook:</h4>
+        <pre style={styles.code}>{`function useFetch(url) {
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  
+  useEffect(() => {
+    fetch(url)
+      .then(res => res.json())
+      .then(setData)
+      .catch(err => setError(err.message))
+      .finally(() => setLoading(false));
+  }, [url]);
+  
+  return { data, loading, error };
+}
+
+// Usage:
+const { data, loading, error } = useFetch('/api/users/1');`}</pre>
+      </div>
+    </div>
+  );
+}
+
+
+// ============================================
+// 5️⃣ EXAMPLE 3: useLocalStorage Hook
+// ============================================
+
+// Custom hook for localStorage
+function useLocalStorage(key, initialValue) {
+  // Get initial value from localStorage or use initialValue
+  const [storedValue, setStoredValue] = useState(() => {
+    try {
+      const item = window.localStorage.getItem(key);
+      return item ? JSON.parse(item) : initialValue;
+    } catch (error) {
+      console.error('Error reading from localStorage:', error);
+      return initialValue;
+    }
+  });
+  
+  // Update localStorage when value changes
+  const setValue = (value) => {
+    try {
+      // Allow value to be a function (like useState)
+      const valueToStore = value instanceof Function ? value(storedValue) : value;
+      
+      setStoredValue(valueToStore);
+      window.localStorage.setItem(key, JSON.stringify(valueToStore));
+    } catch (error) {
+      console.error('Error writing to localStorage:', error);
+    }
+  };
+  
+  return [storedValue, setValue];
+}
+
+// Using the useLocalStorage hook
+function Example3_UseLocalStorage() {
+  // Works exactly like useState, but persists to localStorage!
+  const [name, setName] = useLocalStorage('userName', '');
+  const [todos, setTodos] = useLocalStorage('todos', []);
+  const [newTodo, setNewTodo] = useState('');
+  
+  const addTodo = (e) => {
+    e.preventDefault();
+    if (newTodo.trim()) {
+      setTodos([...todos, { id: Date.now(), text: newTodo }]);
+      setNewTodo('');
+    }
+  };
+  
+  const deleteTodo = (id) => {
+    setTodos(todos.filter(todo => todo.id !== id));
+  };
+  
+  return (
+    <div style={styles.example}>
+      <h3>Example 3: useLocalStorage Hook</h3>
+      
+      <div style={styles.persistent}>
+        ⚡ <strong>Data persists after page refresh!</strong> Try refreshing the page.
+      </div>
+      
+      <div style={styles.section}>
+        <label>Your Name: </label>
+        <input
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          placeholder="Enter your name"
+          style={styles.input}
+        />
+        {name && <p>Hello, {name}! 👋</p>}
+      </div>
+      
+      <div style={styles.section}>
+        <h4>Todo List (Persisted)</h4>
+        <form onSubmit={addTodo} style={styles.todoForm}>
+          <input
+            value={newTodo}
+            onChange={(e) => setNewTodo(e.target.value)}
+            placeholder="Add a todo..."
+            style={styles.input}
+          />
+          <button type="submit" style={styles.button}>Add</button>
+        </form>
+        
+        <div style={styles.todoList}>
+          {todos.map(todo => (
+            <div key={todo.id} style={styles.todoItem}>
+              <span>{todo.text}</span>
+              <button 
+                onClick={() => deleteTodo(todo.id)}
+                style={styles.buttonSmallDanger}
+              >
+                Delete
+              </button>
+            </div>
+          ))}
+        </div>
+      </div>
+      
+      <div style={styles.explanation}>
+        💡 <strong>How useLocalStorage works:</strong><br/>
+        1. Reads from localStorage on mount (if exists)<br/>
+        2. Updates localStorage whenever value changes<br/>
+        3. Uses same API as useState - super easy!<br/>
+        4. Data survives page refresh, browser close<br/>
+        <br/>
+        <strong>Try it:</strong> Refresh the page - your data is still there!
+      </div>
+      
+      <div style={styles.codeBox}>
+        <h4>The useLocalStorage Hook:</h4>
+        <pre style={styles.code}>{`function useLocalStorage(key, initialValue) {
+  const [storedValue, setStoredValue] = useState(() => {
+    const item = localStorage.getItem(key);
+    return item ? JSON.parse(item) : initialValue;
+  });
+  
+  const setValue = (value) => {
+    setStoredValue(value);
+    localStorage.setItem(key, JSON.stringify(value));
+  };
+  
+  return [storedValue, setValue];
+}
+
+// Usage (exactly like useState!):
+const [name, setName] = useLocalStorage('name', '');`}</pre>
+      </div>
+    </div>
+  );
+}
+
+
+// ============================================
+// 6️⃣ EXAMPLE 4: useDebounce Hook
+// ============================================
+
+// Custom hook for debouncing values
+function useDebounce(value, delay = 500) {
+  const [debouncedValue, setDebouncedValue] = useState(value);
+  
+  useEffect(() => {
+    // Set timeout to update debounced value
+    const timeoutId = setTimeout(() => {
+      setDebouncedValue(value);
+    }, delay);
+    
+    // Cleanup: clear timeout if value changes before delay
+    return () => {
+      clearTimeout(timeoutId);
+    };
+  }, [value, delay]);
+  
+  return debouncedValue;
+}
+
+// Using the useDebounce hook
+function Example4_UseDebounce() {
+  const [searchTerm, setSearchTerm] = useState('');
+  const debouncedSearch = useDebounce(searchTerm, 500);
+  const [searchCount, setSearchCount] = useState(0);
+  
+  // This effect only runs when debounced value changes
+  useEffect(() => {
+    if (debouncedSearch) {
+      setSearchCount(prev => prev + 1);
+      console.log('Searching for:', debouncedSearch);
+    }
+  }, [debouncedSearch]);
+  
+  return (
+    <div style={styles.example}>
+      <h3>Example 4: useDebounce Hook</h3>
+      
+      <div style={styles.debounceDemo}>
+        <div style={styles.inputSection}>
+          <label>Type to search (debounced 500ms):</label>
+          <input
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            placeholder="Start typing..."
+            style={styles.input}
+          />
+        </div>
+        
+        <div style={styles.valuesDisplay}>
+          <div style={styles.valueBox}>
+            <div style={styles.label}>Immediate Value:</div>
+            <div style={styles.value}>{searchTerm || '(empty)'}</div>
+            <div style={styles.small}>Updates instantly as you type</div>
+          </div>
+          
+          <div style={styles.arrow}>→</div>
+          
+          <div style={styles.valueBox}>
+            <div style={styles.label}>Debounced Value:</div>
+            <div style={styles.value}>{debouncedSearch || '(empty)'}</div>
+            <div style={styles.small}>Updates 500ms after you stop typing</div>
+          </div>
+        </div>
+        
+        <div style={styles.searchCount}>
+          API calls made: <strong>{searchCount}</strong>
+        </div>
+      </div>
+      
+      <div style={styles.explanation}>
+        💡 <strong>Why use debounce?</strong><br/>
+        <br/>
+        <strong>WITHOUT debounce:</strong><br/>
+        User types "react" → 5 API calls (r, re, rea, reac, react)<br/>
+        <br/>
+        <strong>WITH debounce:</strong><br/>
+        User types "react" → 1 API call (react) after they stop typing<br/>
+        <br/>
+        <strong>Perfect for:</strong><br/>
+        ✅ Search inputs (don't search on every keystroke)<br/>
+        ✅ Resize handlers (don't fire on every pixel)<br/>
+        ✅ API calls (reduce server load)<br/>
+        ✅ Auto-save (don't save on every keystroke)
+      </div>
+      
+      <div style={styles.codeBox}>
+        <h4>The useDebounce Hook:</h4>
+        <pre style={styles.code}>{`function useDebounce(value, delay = 500) {
+  const [debouncedValue, setDebouncedValue] = useState(value);
+  
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      setDebouncedValue(value);
+    }, delay);
+    
+    return () => clearTimeout(timeoutId);
+  }, [value, delay]);
+  
+  return debouncedValue;
+}
+
+// Usage:
+const [search, setSearch] = useState('');
+const debouncedSearch = useDebounce(search, 500);
+
+// Only search when user stops typing
+useEffect(() => {
+  fetch(\`/api/search?q=\${debouncedSearch}\`);
+}, [debouncedSearch]);`}</pre>
+      </div>
+    </div>
+  );
+}
+
+
+// ============================================
+// 7️⃣ HOOK COMPOSITION
+// ============================================
+
+// Example: Combining multiple custom hooks
+function useFetchWithLocalStorage(url, cacheKey) {
+  // Use localStorage hook
+  const [cachedData, setCachedData] = useLocalStorage(cacheKey, null);
+  
+  // Use fetch hook
+  const { data, loading, error } = useFetch(url);
+  
+  // Save to cache when data arrives
+  useEffect(() => {
+    if (data) {
+      setCachedData(data);
+    }
+  }, [data, setCachedData]);
+  
+  // Return cached data if available, otherwise fetched data
+  return {
+    data: data || cachedData,
+    loading: loading && !cachedData,
+    error,
+    cached: !data && cachedData !== null
+  };
+}
+
+function Example5_HookComposition() {
+  const [userId, setUserId] = useState(1);
+  
+  // This hook combines useFetch + useLocalStorage!
+  const { data: user, loading, error, cached } = useFetchWithLocalStorage(
+    `https://jsonplaceholder.typicode.com/users/${userId}`,
+    `user-${userId}`
+  );
+  
+  return (
+    <div style={styles.example}>
+      <h3>Example 5: Hook Composition</h3>
+      
+      <div style={styles.compositionInfo}>
+        <strong>This hook combines:</strong><br/>
+        • useFetch (fetch data from API)<br/>
+        • useLocalStorage (cache the data)<br/>
+        Result: Cached API calls! 🚀
+      </div>
+      
+      <div style={styles.controls}>
+        <label>Select User: </label>
+        <select 
+          value={userId} 
+          onChange={(e) => setUserId(e.target.value)}
+          style={styles.select}
+        >
+          {[1, 2, 3, 4, 5].map(id => (
+            <option key={id} value={id}>User {id}</option>
+          ))}
+        </select>
+        
+        {cached && (
+          <span style={styles.cachedBadge}>
+            ⚡ Loaded from cache!
+          </span>
+        )}
+      </div>
+      
+      {loading && <div style={styles.loading}>Loading...</div>}
+      {error && <div style={styles.error}>Error: {error}</div>}
+      
+      {user && (
+        <div style={styles.userCard}>
+          <h4>{user.name}</h4>
+          <p><strong>Email:</strong> {user.email}</p>
+          <p><strong>Phone:</strong> {user.phone}</p>
+        </div>
+      )}
+      
+      <div style={styles.explanation}>
+        💡 <strong>Hook Composition Benefits:</strong><br/>
+        ✅ Combine simple hooks to create powerful hooks<br/>
+        ✅ Each hook does one thing well<br/>
+        ✅ Reusable building blocks<br/>
+        ✅ Easy to test individually<br/>
+        <br/>
+        <strong>Try it:</strong> Switch users, then switch back - instant load from cache!
+      </div>
+      
+      <div style={styles.codeBox}>
+        <h4>Combining Hooks:</h4>
+        <pre style={styles.code}>{`function useFetchWithLocalStorage(url, cacheKey) {
+  // Use two custom hooks together!
+  const [cachedData, setCachedData] = useLocalStorage(cacheKey, null);
+  const { data, loading, error } = useFetch(url);
+  
+  // Save to cache when data arrives
+  useEffect(() => {
+    if (data) setCachedData(data);
+  }, [data, setCachedData]);
+  
+  return {
+    data: data || cachedData,
+    loading: loading && !cachedData,
+    cached: !data && cachedData !== null
+  };
+}`}</pre>
+      </div>
+    </div>
+  );
+}
+
+
+// ============================================
+// 8️⃣ PROJECT: 3 Custom Hooks Library
+// ============================================
+
+// Hook 1: useToggle
+function useToggle(initialValue = false) {
+  const [value, setValue] = useState(initialValue);
+  
+  const toggle = () => setValue(prev => !prev);
+  const setTrue = () => setValue(true);
+  const setFalse = () => setValue(false);
+  
+  return [value, { toggle, setTrue, setFalse }];
+}
+
+// Hook 2: useClickOutside
+function useClickOutside(callback) {
+  const ref = useRef(null);
+  
+  useEffect(() => {
+    const handleClick = (event) => {
+      if (ref.current && !ref.current.contains(event.target)) {
+        callback();
+      }
+    };
+    
+    document.addEventListener('mousedown', handleClick);
+    
+    return () => {
+      document.removeEventListener('mousedown', handleClick);
+    };
+  }, [callback]);
+  
+  return ref;
+}
+
+// Hook 3: usePrevious
+function usePrevious(value) {
+  const ref = useRef();
+  
+  useEffect(() => {
+    ref.current = value;
+  }, [value]);
+  
+  return ref.current;
+}
+
+// Demo component using all 3 hooks
+function Project_CustomHooksLibrary() {
+  // Using useToggle
+  const [isOpen, toggleActions] = useToggle(false);
+  
+  // Using useClickOutside
+  const modalRef = useClickOutside(() => {
+    toggleActions.setFalse();
+  });
+  
+  // Using usePrevious
+  const [count, setCount] = useState(0);
+  const previousCount = usePrevious(count);
+  
+  return (
+    <div style={styles.example}>
+      <h3>🎯 PROJECT: Custom Hooks Library</h3>
+      
+      {/* useToggle Demo */}
+      <div style={styles.projectSection}>
+        <h4>1. useToggle Hook</h4>
+        <button onClick={toggleActions.toggle} style={styles.button}>
+          {isOpen ? 'Hide' : 'Show'} Content
+        </button>
+        
+        {isOpen && (
+          <div style={styles.toggleContent}>
+            <p>This content is toggled! ✨</p>
+            <button onClick={toggleActions.setFalse} style={styles.buttonSecondary}>
+              Close
+            </button>
+          </div>
+        )}
+        
+        <div style={styles.codeBox}>
+          <pre style={styles.codeSmall}>{`const [isOpen, { toggle, setTrue, setFalse }] = useToggle(false);
+
+<button onClick={toggle}>Toggle</button>
+<button onClick={setTrue}>Open</button>
+<button onClick={setFalse}>Close</button>`}</pre>
+        </div>
+      </div>
+      
+      {/* useClickOutside Demo */}
+      <div style={styles.projectSection}>
+        <h4>2. useClickOutside Hook</h4>
+        <button onClick={toggleActions.setTrue} style={styles.button}>
+          Open Modal
+        </button>
+        
+        {isOpen && (
+          <div style={styles.modalOverlay}>
+            <div ref={modalRef} style={styles.modal}>
+              <h3>Modal Window</h3>
+              <p>Click outside this box to close!</p>
+              <button onClick={toggleActions.setFalse} style={styles.button}>
+                Close
+              </button>
+            </div>
+          </div>
+        )}
+        
+        <div style={styles.codeBox}>
+          <pre style={styles.codeSmall}>{`const modalRef = useClickOutside(() => {
+  setIsOpen(false); // Close modal
+});
+
+<div ref={modalRef}>
+  Modal content
+</div>`}</pre>
+        </div>
+      </div>
+      
+      {/* usePrevious Demo */}
+      <div style={styles.projectSection}>
+        <h4>3. usePrevious Hook</h4>
+        
+        <div style={styles.previousDemo}>
+          <div style={styles.valueBox}>
+            <div style={styles.label}>Previous:</div>
+            <div style={styles.bigNumber}>{previousCount ?? 'None'}</div>
+          </div>
+          
+          <div style={styles.arrow}>→</div>
+          
+          <div style={styles.valueBox}>
+            <div style={styles.label}>Current:</div>
+            <div style={styles.bigNumber}>{count}</div>
+          </div>
+        </div>
+        
+        <div style={styles.buttonGroup}>
+          <button onClick={() => setCount(count + 1)} style={styles.button}>
+            Increment
+          </button>
+          <button onClick={() => setCount(0)} style={styles.buttonSecondary}>
+            Reset
+          </button>
+        </div>
+        
+        <div style={styles.codeBox}>
+          <pre style={styles.codeSmall}>{`const [count, setCount] = useState(0);
+const previousCount = usePrevious(count);
+
+// Now you can compare current vs previous!
+if (count > previousCount) {
+  console.log('Count increased!');
+}`}</pre>
+        </div>
+      </div>
+      
+      <div style={styles.libraryInfo}>
+        <h4>📚 Your Custom Hooks Library</h4>
+        <ul style={styles.list}>
+          <li><strong>useToggle:</strong> Boolean state with toggle/setTrue/setFalse helpers</li>
+          <li><strong>useClickOutside:</strong> Detect clicks outside an element</li>
+          <li><strong>usePrevious:</strong> Track previous value of any state</li>
+        </ul>
+        
+        <div style={styles.useCases}>
+          <h4>Real-World Use Cases:</h4>
+          <ul style={styles.list}>
+            <li><strong>useToggle:</strong> Modals, dropdowns, sidebars, accordions</li>
+            <li><strong>useClickOutside:</strong> Close dropdowns, modals, tooltips</li>
+            <li><strong>usePrevious:</strong> Compare changes, animations, undo/redo</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+
+// ============================================
+// MAIN APP - All Examples Together
+// ============================================
+
+function CustomHooksTutorial() {
+  const [activeExample, setActiveExample] = useState('intro');
+  
+  const examples = [
+    { id: 'intro', label: 'Introduction', component: IntroSection },
+    { id: 'rules', label: 'Rules of Hooks', component: RulesSection },
+    { id: 'ex1', label: '1. useCounter', component: Example1_UseCounter },
+    { id: 'ex2', label: '2. useFetch', component: Example2_UseFetch },
+    { id: 'ex3', label: '3. useLocalStorage', component: Example3_UseLocalStorage },
+    { id: 'ex4', label: '4. useDebounce', component: Example4_UseDebounce },
+    { id: 'ex5', label: '5. Composition', component: Example5_HookComposition },
+    { id: 'project', label: '🎯 Project', component: Project_CustomHooksLibrary },
+  ];
+  
+  const ActiveComponent = examples.find(ex => ex.id === activeExample)?.component;
+  
+  return (
+    <div style={styles.app}>
+      <h1 style={styles.mainTitle}>Custom Hooks - Complete Tutorial</h1>
+      
+      <div style={styles.navigation}>
+        {examples.map(example => (
+          <button
+            key={example.id}
+            onClick={() => setActiveExample(example.id)}
+            style={{
+              ...styles.navButton,
+              backgroundColor: activeExample === example.id ? '#3b82f6' : '#e5e7eb',
+              color: activeExample === example.id ? 'white' : '#1f2937',
+            }}
+          >
+            {example.label}
+          </button>
+        ))}
+      </div>
+      
+      <div style={styles.content}>
+        {ActiveComponent && <ActiveComponent />}
+      </div>
+    </div>
+  );
+}
+
+// Introduction Section
+function IntroSection() {
+  return (
+    <div style={styles.intro}>
+      <h2>Welcome to Custom Hooks! 🎣</h2>
+      
+      <div style={styles.section}>
+        <h3>What are Custom Hooks?</h3>
+        <p>
+          Custom Hooks are <strong>JavaScript functions</strong> that let you extract and 
+          reuse component logic. They're like building blocks you can combine to create 
+          powerful, reusable functionality.
+        </p>
+      </div>
+      
+      <div style={styles.section}>
+        <h3>Why Use Custom Hooks?</h3>
+        <ul style={styles.list}>
+          <li>✅ <strong>Reusability:</strong> Write once, use everywhere</li>
+          <li>✅ <strong>Clean Code:</strong> Components stay simple and focused</li>
+          <li>✅ <strong>Easy Testing:</strong> Test hooks independently</li>
+          <li>✅ <strong>Share Logic:</strong> No need for HOCs or render props</li>
+          <li>✅ <strong>Composition:</strong> Combine simple hooks to make complex ones</li>
+        </ul>
+      </div>
+      
+      <div style={styles.section}>
+        <h3>Naming Convention:</h3>
+        <div style={styles.highlight}>
+          <strong>Custom hooks MUST start with "use"</strong>
+        </div>
+        <ul style={styles.list}>
+          <li>✅ useCounter, useFetch, useLocalStorage</li>
+          <li>❌ counter, fetchData, storage</li>
+        </ul>
+      </div>
+      
+      <div style={styles.section}>
+        <h3>Basic Structure:</h3>
+        <pre style={styles.code}>{`function useMyCustomHook(initialValue) {
+  // Use other hooks (useState, useEffect, etc.)
+  const [value, setValue] = useState(initialValue);
+  
+  // Your custom logic here
+  const doSomething = () => {
+    setValue(value + 1);
+  };
+  
+  // Return what components need
+  return { value, doSomething };
+}
+
+// Usage in component:
+function MyComponent() {
+  const { value, doSomething } = useMyCustomHook(0);
+  return <button onClick={doSomething}>{value}</button>;
+}`}</pre>
+      </div>
+      
+      <div style={styles.callout}>
+        <h3>🚀 Ready to Build Custom Hooks?</h3>
+        <p>Click through the examples to learn how to create reusable, powerful hooks!</p>
+      </div>
+    </div>
+  );
+}
+
+// Rules Section
+function RulesSection() {
+  return (
+    <div style={styles.intro}>
+      <h2>🚨 Rules of Hooks</h2>
+      
+      <div style={styles.warningBox}>
+        <strong>CRITICAL:</strong> These rules MUST be followed or your app will break!
+      </div>
+      
+      <div style={styles.section}>
+        <h3>Rule 1: Only Call Hooks at the Top Level</h3>
+        <p><strong>❌ DON'T call hooks inside:</strong></p>
+        <ul style={styles.list}>
+          <li>Loops (for, while)</li>
+          <li>Conditions (if, switch)</li>
+          <li>Nested functions</li>
+        </ul>
+        
+        <div style={styles.codeComparison}>
+          <div>
+            <h4 style={{color: '#ef4444'}}>❌ WRONG:</h4>
+            <pre style={styles.codeError}>{`function Component() {
+  if (condition) {
+    const [count, setCount] = useState(0);
+  }
+  
+  for (let i = 0; i < 10; i++) {
+    const data = useFetch('/api/' + i);
+  }
+}`}</pre>
+          </div>
+          
+          <div>
+            <h4 style={{color: '#10b981'}}>✅ CORRECT:</h4>
+            <pre style={styles.codeSuccess}>{`function Component() {
+  const [count, setCount] = useState(0);
+  const data = useFetch('/api/data');
+  
+  if (condition) {
+    // Use the state here
+  }
+}`}</pre>
+          </div>
+        </div>
+      </div>
+      
+      <div style={styles.section}>
+        <h3>Rule 2: Only Call Hooks from React Functions</h3>
+        <p><strong>✅ Call hooks from:</strong></p>
+        <ul style={styles.list}>
+          <li>React function components</li>
+          <li>Custom hooks</li>
+        </ul>
+        
+        <p><strong>❌ DON'T call hooks from:</strong></p>
+        <ul style={styles.list}>
+          <li>Regular JavaScript functions</li>
+          <li>Class components</li>
+          <li>Event handlers</li>
+        </ul>
+      </div>
+      
+      <div style={styles.section}>
+        <h3>Rule 3: Custom Hooks Must Start with "use"</h3>
+        <ul style={styles.list}>
+          <li>✅ useCounter, useFetch, useAuth</li>
+          <li>❌ counter, getData, authentication</li>
+        </ul>
+        <p>This tells React it's a hook and follows hook rules.</p>
+      </div>
+      
+      <div style={styles.section}>
+        <h3>Why These Rules?</h3>
+        <div style={styles.highlight}>
+          React relies on the <strong>ORDER</strong> of hook calls to track state between renders.
+        </div>
+        <p>
+          If you call hooks conditionally, the order can change between renders, 
+          breaking React's ability to track which state belongs to which hook.
+        </p>
+      </div>
+    </div>
+  );
+}
+
+// Styles
+const styles = {
+  app: {
+    maxWidth: '1200px',
+    margin: '0 auto',
+    padding: '20px',
+    fontFamily: 'Arial, sans-serif',
+  },
+  mainTitle: {
+    textAlign: 'center',
+    color: '#1f2937',
+    marginBottom: '30px',
+  },
+  navigation: {
+    display: 'flex',
+    gap: '10px',
+    marginBottom: '30px',
+    flexWrap: 'wrap',
+  },
+  navButton: {
+    padding: '10px 20px',
+    border: 'none',
+    borderRadius: '8px',
+    cursor: 'pointer',
+    fontSize: '14px',
+    fontWeight: 'bold',
+    transition: 'all 0.3s',
+  },
+  content: {
+    backgroundColor: 'white',
+    borderRadius: '12px',
+    padding: '30px',
+    boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
+  },
+  intro: {
+    lineHeight: '1.6',
+  },
+  section: {
+    marginBottom: '30px',
+  },
+  code: {
+    backgroundColor: '#1f2937',
+    color: '#10b981',
+    padding: '15px',
+    borderRadius: '8px',
+    overflow: 'auto',
+    fontSize: '14px',
+  },
+  codeSmall: {
+    backgroundColor: '#1f2937',
+    color: '#10b981',
+    padding: '10px',
+    borderRadius: '6px',
+    fontSize: '12px',
+    margin: 0,
+  },
+  codeError: {
+    backgroundColor: '#1f2937',
+    color: '#ef4444',
+    padding: '15px',
+    borderRadius: '8px',
+    fontSize: '13px',
+  },
+  codeSuccess: {
+    backgroundColor: '#1f2937',
+    color: '#10b981',
+    padding: '15px',
+    borderRadius: '8px',
+    fontSize: '13px',
+  },
+  list: {
+    lineHeight: '2',
+  },
+  callout: {
+    backgroundColor: '#dbeafe',
+    padding: '20px',
+    borderRadius: '8px',
+    borderLeft: '4px solid #3b82f6',
+  },
+  warningBox: {
+    backgroundColor: '#fee2e2',
+    padding: '15px',
+    borderRadius: '8px',
+    borderLeft: '4px solid #ef4444',
+    marginBottom: '20px',
+  },
+  highlight: {
+    backgroundColor: '#fef3c7',
+    padding: '10px',
+    borderRadius: '6px',
+    marginBottom: '10px',
+  },
+  codeComparison: {
+    display: 'grid',
+    gridTemplateColumns: '1fr 1fr',
+    gap: '20px',
+    marginTop: '15px',
+  },
+  example: {
+    padding: '20px',
+    backgroundColor: '#f9fafb',
+    borderRadius: '8px',
+  },
+  twoColumns: {
+    display: 'grid',
+    gridTemplateColumns: '1fr 1fr',
+    gap: '20px',
+    marginBottom: '20px',
+  },
+  counterBox: {
+    backgroundColor: 'white',
+    padding: '20px',
+    borderRadius: '8px',
+    textAlign: 'center',
+  },
+  bigNumber: {
+    fontSize: '48px',
+    fontWeight: 'bold',
+    color: '#3b82f6',
+    margin: '20px 0',
+  },
+  buttonGroup: {
+    display: 'flex',
+    gap: '10px',
+    justifyContent: 'center',
+  },
+  button: {
+    padding: '10px 20px',
+    backgroundColor: '#3b82f6',
+    color: 'white',
+    border: 'none',
+    borderRadius: '6px',
+    cursor: 'pointer',
+    fontSize: '16px',
+    fontWeight: 'bold',
+  },
+  buttonSecondary: {
+    padding: '10px 20px',
+    backgroundColor: '#6b7280',
+    color: 'white',
+    border: 'none',
+    borderRadius: '6px',
+    cursor: 'pointer',
+    fontSize: '16px',
+  },
+  buttonSmallDanger: {
+    padding: '6px 12px',
+    backgroundColor: '#ef4444',
+    color: 'white',
+    border: 'none',
+    borderRadius: '4px',
+    cursor: 'pointer',
+    fontSize: '14px',
+  },
+  explanation: {
+    backgroundColor: '#fef3c7',
+    padding: '15px',
+    borderRadius: '8px',
+    marginTop: '15px',
+    fontSize: '14px',
+    lineHeight: '1.8',
+  },
+  codeBox: {
+    marginTop: '15px',
+  },
+  controls: {
+    display: 'flex',
+    gap: '10px',
+    alignItems: 'center',
+    marginBottom: '20px',
+    padding: '15px',
+    backgroundColor: 'white',
+    borderRadius: '8px',
+  },
+  select: {
+    padding: '8px 12px',
+    fontSize: '16px',
+    borderRadius: '6px',
+    border: '2px solid #e5e7eb',
+  },
+  loading: {
+    textAlign: 'center',
+    padding: '40px',
+    color: '#3b82f6',
+    fontSize: '18px',
+  },
+  error: {
+    backgroundColor: '#fee2e2',
+    color: '#991b1b',
+    padding: '20px',
+    borderRadius: '8px',
+    textAlign: 'center',
+  },
+  userCard: {
+    backgroundColor: 'white',
+    padding: '20px',
+    borderRadius: '8px',
+    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+  },
+  persistent: {
+    backgroundColor: '#dbeafe',
+    padding: '15px',
+    borderRadius: '8px',
+    marginBottom: '20px',
+    textAlign: 'center',
+  },
+  input: {
+    padding: '10px',
+    fontSize: '16px',
+    borderRadius: '6px',
+    border: '2px solid #e5e7eb',
+    marginRight: '10px',
+    minWidth: '200px',
+  },
+  todoForm: {
+    display: 'flex',
+    gap: '10px',
+    marginBottom: '15px',
+  },
+  todoList: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '8px',
+  },
+  todoItem: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: '10px',
+    backgroundColor: 'white',
+    borderRadius: '6px',
+  },
+  debounceDemo: {
+    backgroundColor: 'white',
+    padding: '20px',
+    borderRadius: '8px',
+    marginBottom: '20px',
+  },
+  inputSection: {
+    marginBottom: '20px',
+  },
+  valuesDisplay: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '20px',
+    marginBottom: '20px',
+  },
+  valueBox: {
+    flex: 1,
+    backgroundColor: '#f9fafb',
+    padding: '15px',
+    borderRadius: '8px',
+    textAlign: 'center',
+  },
+  label: {
+    fontSize: '12px',
+    color: '#6b7280',
+    marginBottom: '8px',
+  },
+  value: {
+    fontSize: '24px',
+    fontWeight: 'bold',
+    color: '#1f2937',
+    marginBottom: '8px',
+  },
+  small: {
+    fontSize: '11px',
+    color: '#9ca3af',
+  },
+  arrow: {
+    fontSize: '32px',
+    color: '#3b82f6',
+  },
+  searchCount: {
+    backgroundColor: '#e0e7ff',
+    padding: '10px',
+    borderRadius: '6px',
+    textAlign: 'center',
+  },
+  compositionInfo: {
+    backgroundColor: '#d1fae5',
+    padding: '15px',
+    borderRadius: '8px',
+    marginBottom: '20px',
+  },
+  cachedBadge: {
+    backgroundColor: '#10b981',
+    color: 'white',
+    padding: '5px 10px',
+    borderRadius: '4px',
+    fontSize: '14px',
+    fontWeight: 'bold',
+  },
+  projectSection: {
+    backgroundColor: 'white',
+    padding: '20px',
+    borderRadius: '8px',
+    marginBottom: '20px',
+  },
+  toggleContent: {
+    backgroundColor: '#f0f9ff',
+    padding: '15px',
+    borderRadius: '8px',
+    marginTop: '10px',
+  },
+  modalOverlay: {
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 1000,
+  },
+  modal: {
+    backgroundColor: 'white',
+    padding: '30px',
+    borderRadius: '12px',
+    maxWidth: '400px',
+    boxShadow: '0 10px 25px rgba(0,0,0,0.2)',
+  },
+  previousDemo: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '20px',
+    justifyContent: 'center',
+    marginBottom: '20px',
+  },
+  libraryInfo: {
+    backgroundColor: '#f0f9ff',
+    padding: '20px',
+    borderRadius: '8px',
+    marginTop: '20px',
+  },
+  useCases: {
+    backgroundColor: 'white',
+    padding: '15px',
+    borderRadius: '8px',
+    marginTop: '15px',
+  },
+};
+
+export default CustomHooksTutorial;
