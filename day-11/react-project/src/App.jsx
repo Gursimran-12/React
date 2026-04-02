@@ -3,6 +3,8 @@ import ControlledForm from "./components/controlled"
 import UncontrolledForm from "./components/uncontrolled"
 import ThemeSwitcher from "./understanding-context/basicContext"
 import AdvancedContext from "./understanding-context/advancedContext"
+import Context from "./understanding-context/stateManagement"
+import MiniRedux from "./understanding-context/redux"
 
 function App() {
 
@@ -18,6 +20,11 @@ function App() {
     <ThemeSwitcher />
     <hr />
     <AdvancedContext />
+    <hr />
+    <Context />
+    <hr />
+    <MiniRedux />
+    
     </>
   )
 }
