@@ -5,6 +5,7 @@ import ThemeSwitcher from "./understanding-context/basicContext"
 import AdvancedContext from "./understanding-context/advancedContext"
 import Context from "./understanding-context/stateManagement"
 import MiniRedux from "./understanding-context/redux"
+import RoutingTutorial from "./assets/routing/routing"
 
 function App() {
 
@@ -24,6 +25,8 @@ function App() {
     <Context />
     <hr />
     <MiniRedux />
+    <hr />
+    <RoutingTutorial />
     
     </>
   )

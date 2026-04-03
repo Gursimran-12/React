@@ -2,6 +2,11 @@ import './App.css'
 // Importing Header and Footer
 import Header from './components/header'
 import Footer from './components/footer'
+import Counter from './practice/useState'
+import TodoApp from './practice/todo'
+import CharacterCounter from './practice/characterCount'
+import Toggle from './practice/showAndHideToggle'
+import 
 
 function App() {
   
@@ -20,6 +25,14 @@ function App() {
     <Header />
     {/* Calling the footer component */}
     <Footer />
+    <hr />
+    <Counter />
+    <hr />
+    <TodoApp />
+    <hr />
+    <CharacterCounter />
+    <hr />
+    <Toggle />
     </>
   )
 }

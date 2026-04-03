@@ -4,13 +4,14 @@ import Example_withToggle from './components/HOCs/withToggle'
 import Example1_ChildrenProp from './composition/childrenProp'
 import Example2_CompoundComponents from './composition/compoundComponent'
 import Example3_RenderProps from './composition/renderProp'
+import Wrap from './practice/wrap'
 
 function App() {
 
 
   return (
     <>
-    <Example_withLoading />
+    {/* <Example_withLoading />
     <Example_withLogger />
     <Example_withToggle />
     <hr />
@@ -19,6 +20,8 @@ function App() {
     <Example2_CompoundComponents />
     <hr />
     <Example3_RenderProps />
+    <hr /> */}
+    <Wrap />
     </>
   )
 }
