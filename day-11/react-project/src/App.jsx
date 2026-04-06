@@ -6,6 +6,7 @@ import AdvancedContext from "./understanding-context/advancedContext"
 import Context from "./understanding-context/stateManagement"
 import MiniRedux from "./understanding-context/redux"
 import RoutingTutorial from "./assets/routing/routing"
+import AdvancedFormsTutorial from "./advancedFormMangement/formManagement"
 
 function App() {
 
@@ -27,7 +28,8 @@ function App() {
     <MiniRedux />
     <hr />
     <RoutingTutorial />
-    
+    <hr />
+    <AdvancedFormsTutorial />
     </>
   )
 }
