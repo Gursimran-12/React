@@ -1,3 +1,13 @@
+// ============================================
+// 3️FILE UPLOADS & PREVIEWS
+// ============================================
+
+/* FILE HANDLING BASICS:
+1. Access file via `e.target.files[0]`.
+2. Generate preview via `URL.createObjectURL(file)`.
+3. Clear memory using `URL.revokeObjectURL()` to prevent leaks.
+*/
+
 import { useState } from 'react';
 
 export default function ImageUploadDemo() {

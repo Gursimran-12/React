@@ -7,6 +7,8 @@ import Context from "./understanding-context/stateManagement"
 import MiniRedux from "./understanding-context/redux"
 import RoutingTutorial from "./assets/routing/routing"
 import AdvancedFormsTutorial from "./advancedFormMangement/formManagement"
+// import Form from "./advancedFormMangement/registrationForm"
+import ApiIntegrationMasterclass from "./advanced-api-mangement/completeTopic"
 
 function App() {
 
@@ -16,7 +18,7 @@ function App() {
     {/* <FormsCompleteTutorial /> */}
     <hr />
     {/* <ControlledForm /> */}
-    <hr />
+    {/* <hr />
     <UncontrolledForm />
     <hr />
     <ThemeSwitcher />
@@ -30,6 +32,10 @@ function App() {
     <RoutingTutorial />
     <hr />
     <AdvancedFormsTutorial />
+    <hr /> */}
+    {/* <Form /> */}
+    <hr />
+    <ApiIntegrationMasterclass />
     </>
   )
 }
