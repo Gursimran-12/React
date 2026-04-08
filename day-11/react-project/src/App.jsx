@@ -8,6 +8,7 @@ import MiniRedux from "./understanding-context/redux"
 import RoutingTutorial from "./assets/routing/routing"
 import AdvancedFormsTutorial from "./advancedFormMangement/formManagement"
 // import Form from "./advancedFormMangement/registrationForm"
+import MemoizationDemo from "./optimization/reactMemo"
 import ApiIntegrationMasterclass from "./advanced-api-mangement/completeTopic"
 
 function App() {
@@ -36,6 +37,8 @@ function App() {
     {/* <Form /> */}
     <hr />
     <ApiIntegrationMasterclass />
+    <hr />
+    <MemoizationDemo />
     </>
   )
 }
