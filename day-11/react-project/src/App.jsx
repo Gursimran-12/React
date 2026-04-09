@@ -8,8 +8,12 @@ import MiniRedux from "./understanding-context/redux"
 import RoutingTutorial from "./assets/routing/routing"
 import AdvancedFormsTutorial from "./advancedFormMangement/formManagement"
 // import Form from "./advancedFormMangement/registrationForm"
-import MemoizationDemo from "./optimization/reactMemo"
 import ApiIntegrationMasterclass from "./advanced-api-mangement/completeTopic"
+import PerformanceMasterclass from "./optimization/CompleteProgram"
+import MemoizationDemo from "./optimization/memoizationDemo"
+import CallbackDemo from "./optimization/callBackdemo"
+import CodeSplittingDemo from "./optimization/codeSplitingDemo"
+import StylingMasterclass from "./styling/completeCode"
 
 function App() {
 
@@ -35,10 +39,20 @@ function App() {
     <AdvancedFormsTutorial />
     <hr /> */}
     {/* <Form /> */}
-    <hr />
+    {/* <hr />
     <ApiIntegrationMasterclass />
     <hr />
-    <MemoizationDemo />
+    <MemoizationDemo /> */}
+    {/* <hr />
+    <PerformanceMasterclass /> */}
+    {/* <hr />
+    <MemoizationDemo /> */}
+    {/* <hr />
+    <CallbackDemo />
+    <hr />
+    <CodeSplittingDemo /> */}
+    <hr />
+    <StylingMasterclass />
     </>
   )
 }
