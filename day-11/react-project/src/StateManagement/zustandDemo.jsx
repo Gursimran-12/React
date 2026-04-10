@@ -25,7 +25,7 @@
 
 
 import { create } from "zustand";
-
+// Create: creates the global variables which we can access from anywhere
 
 const useCartStore = create((set) => ({
   cart: [],
